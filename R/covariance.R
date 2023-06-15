@@ -56,25 +56,6 @@ periodic_cov <- function(x1, x2, sigma = 0.3, p = 0.8, l = 0.5) {
   return(sigma ^ 2 * exp(-2 * dist_squared / (l ^ 2)))
 }
 
-#' White noise kernel function
-#'
-#' @param x1 \code{numeric} vector of values for first dataset
-#' @param x2 \code{numeric} vector of values for second dataset
-#' @param sigma \code{numeric} scalar denoting hyperparameter for average distance from the mean. Defaults to \code{0.3}
-#' @return \code{numeric} vector of covariance values
-#' @author Trent Henderson
-#' @export
-#'
-
-noise_cov <- function(x1, x2, sigma = 0.3) {
-  stopifnot(sigma > 0)
-  if (x1 == x2) {
-    return(sigma ^ 2)
-  } else {
-    return(0)
-  }
-}
-
 #' Matern kernel function
 #'
 #' @param x1 \code{numeric} vector of values for first dataset
@@ -93,4 +74,23 @@ matern_cov <- function(x1, x2, sigma = 0.3, l = 0.8, nu = 1.5) {
   term1 <- ((2 ^ (nu - 1)) / gamma(nu)) * ((sqrt(2 * nu) * dist) / l) ^ nu
   term2 <- besselK(sqrt(2 * nu) * dist / l, nu)
   return(sigma ^ 2 * term1 * term2)
+}
+
+#' White noise kernel function
+#'
+#' @param x1 \code{numeric} vector of values for first dataset
+#' @param x2 \code{numeric} vector of values for second dataset
+#' @param sigma \code{numeric} scalar denoting hyperparameter for average distance from the mean. Defaults to \code{0.3}
+#' @return \code{numeric} vector of covariance values
+#' @author Trent Henderson
+#' @export
+#'
+
+noise_cov <- function(x1, x2, sigma = 0.3) {
+  stopifnot(sigma > 0)
+  if (x1 == x2) {
+    return(sigma ^ 2)
+  } else {
+    return(0)
+  }
 }
