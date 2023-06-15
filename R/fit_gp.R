@@ -27,9 +27,37 @@ fit_gp <- function(X, y, cov_fun = list(list(name = "se", sigma = 0.3, l = 0.8))
 
   #----------------- Prior covariance function ----------------
 
-  # Check covariance function arguments
+  if(length(cov_fun) >= 2 && combine_kernels %ni% c("add", "multiply")){
+    stop("If multiple covariance functions are listed, combine_kernels must be either 'add' or 'multiply'.")
+  }
 
-  XX
+  # Check covariance function names and hyperparameter specifications
+
+  for(i in 1:length(cov_fun)){
+    if(cov_fun[[i]]$name == "linear"){
+      if(names(cov_fun[[i]])[!names(cov_fun[[i]]) == 'name'] != c("sigma", "sigma_b", "c")){
+        stop("linear covariance function requires hyperparameters 'sigma', 'sigma_b' and 'c'.")
+      }
+    } else if(cov_fun[[i]]$name == "se"){
+      if(names(cov_fun[[i]])[!names(cov_fun[[i]]) == 'name'] != c("sigma", "l")){
+        stop("se covariance function requires hyperparameters 'sigma' and 'l'.")
+      }
+    } else if(cov_fun[[i]]$name == "periodic"){
+      if(names(cov_fun[[i]])[!names(cov_fun[[i]]) == 'name'] != c("sigma", "p", "l")){
+        stop("periodic covariance function requires hyperparameters 'sigma', 'p', and 'l'.")
+      }
+    } else if(cov_fun[[i]]$name == "matern"){
+      if(names(cov_fun[[i]])[!names(cov_fun[[i]]) == 'name'] != c("sigma", "l", "nu")){
+        stop("matern covariance function requires hyperparameters 'sigma', 'l', and 'nu'.")
+      }
+    } else if(cov_fun[[i]]$name == "noise"){
+      if(names(cov_fun[[i]])[!names(cov_fun[[i]]) == 'name'] != c("sigma")){
+        stop("noise covariance function requires hyperparameter 'sigma'.")
+      }
+    } else{
+      stop("An invalid covariance function was found. Covariance functions must be one of 'linear', 'se', 'periodic', 'matern' or 'noise'.")
+    }
+  }
 
   # Produce final prior covariance matrix
 
