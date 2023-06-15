@@ -31,6 +31,11 @@ fit_gp <- function(X, y, cov_fun = list(list(name = "se", sigma = 0.3, l = 0.8))
     stop("If multiple covariance functions are listed, combine_kernels must be either 'add' or 'multiply'.")
   }
 
+  if(length(cov_fun) == 1 && combine_kernels != "no"){
+    message("A single covariance function was detected. Changing to no kernel combination.")
+    combine_kernels <- "no"
+  }
+
   # Check covariance function names and hyperparameter specifications
 
   for(i in 1:length(cov_fun)){
@@ -59,9 +64,21 @@ fit_gp <- function(X, y, cov_fun = list(list(name = "se", sigma = 0.3, l = 0.8))
     }
   }
 
-  # Produce final prior covariance matrix
+  # Calculate covariance matrix
 
-  XX
+  sigmas <- vector(mode = "list", length = length(cov_fun))
+
+  for(i in 1:length(cov_fun)){
+    sigmas[[i]] <- calc_cov(X = X, covariance = cov_fun[[i]])
+  }
+
+  if(combine_kernels == "no"){
+    Sigma <- sigmas[[1]]
+  } else if(combine_kernels == "add"){
+    Sigma <- Reduce(`+`, sigmas)
+  } else{
+    Sigma <- Reduce(`%*%`, sigmas)
+  }
 
   #----------------- Fit the GP ----------------
 
