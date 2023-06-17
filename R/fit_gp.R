@@ -69,7 +69,7 @@ fit_gp <- function(X, y, cov_fun = list(list(name = "se", sigma = 0.3, l = 0.8))
   sigmas <- vector(mode = "list", length = length(cov_fun))
 
   for(i in 1:length(cov_fun)){
-    sigmas[[i]] <- calc_cov(X = X, covariance = cov_fun[[i]])
+    sigmas[[i]] <- calc_cov(x1 = X, x2 = X, covariance = cov_fun[[i]])
   }
 
   if(combine_kernels == "no"){
