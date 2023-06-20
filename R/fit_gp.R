@@ -4,7 +4,7 @@
 #' @param y \code{vector} of output values
 #' @param cov_fun \code{list} of lists containing the covariance functions to use and their respective hyperparameters. Each covariance function should have its own list, complete with values for "name" and the hyperparameters, e.g., \code{list(list(name = "se", sigma = 0.3, l = 0.8), list(name = "periodic", sigma = 0.3, p = 0.8, l = 0.5))}. Defaults to \code{list(list(name = "se", sigma = 0.3, l = 0.8))}
 #' @param combine_kernels \code{character} denoting whether to combine covariance functions if multiple were specified. Can be one of \code{"no"} for no combining (only works for single function specification), \code{"add"} or \code{"multiply"}
-#' @param optimise \code{Boolean} whether to optimise hyperparameters using maximum likelihood estimation. Defaults to \code{FALSE}
+#' @param optimise \code{Boolean} whether to optimise hyperparameters using maximum likelihood estimation. Defaults to \code{FALSE} to use user-specified hyperparameters in the \code{cov_fun} argument. If \code{TRUE}, the function will find the optimal value for each hyperparameter regardless of user input
 #' @param normalise \code{Boolean} whether to z-score the input data prior to fitting the GP. Defaults to \code{FALSE}
 #' @return \code{GP} class object containing the posterior mean vector and posterior covariance matrix
 #' @author Trent Henderson
@@ -69,7 +69,7 @@ fit_gp <- function(X, y, cov_fun = list(list(name = "se", sigma = 0.3, l = 0.8))
   sigmas <- vector(mode = "list", length = length(cov_fun))
 
   for(i in 1:length(cov_fun)){
-    sigmas[[i]] <- calc_cov(X = X, covariance = cov_fun[[i]])
+    sigmas[[i]] <- calc_cov(x1 = X, x2 = X, covariance = cov_fun[[i]])
   }
 
   if(combine_kernels == "no"){
@@ -77,7 +77,7 @@ fit_gp <- function(X, y, cov_fun = list(list(name = "se", sigma = 0.3, l = 0.8))
   } else if(combine_kernels == "add"){
     Sigma <- Reduce(`+`, sigmas)
   } else{
-    Sigma <- Reduce(`%*%`, sigmas)
+    Sigma <- Reduce(`*`, sigmas)
   }
 
   #----------------- Fit the GP ----------------
